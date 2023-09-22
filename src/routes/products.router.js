@@ -1,5 +1,5 @@
 const {Router} = require('express')
-const {productModel} = require('../models/products.model')
+const productModel = require('../models/products.model')
 
 const router = Router()
 
@@ -24,7 +24,7 @@ router.get('/api/products', async(req, res)=>{
             products = await productModel.paginate({stock: Number(query)}, {limit: limit, page: page, sort: {precio: sort} })
         }
 
-        //console.log(products) 
+        console.log(products) 
         
         res.send({result: 'success', payload: products})
     }catch(error){

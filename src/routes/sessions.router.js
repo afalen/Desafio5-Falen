@@ -2,51 +2,74 @@ const express = require('express')
 
 const router = express.Router()
 
-const User = require('../models/user')
+const usuario = require('../models/user.model')
 
-router.get("/register", (req, res)=>{
-    res.render('register')
+router.get("/login", async (req, res) => {
+    res.render("login")
 })
 
-router.post("/register", async (req, res) => {
-    try {
-        if( !req.session.first_name || !req.session.last_name || !req.session.email ){
-            const { first_name, last_name, email, age, password } = req.body
+router.get("/register", async (req, res) => {
+    res.render("register")
+})
+
+router.post('/register', async (req, res) => {
+    const { first_name, last_name, email, age, password } = req.body;
+
+
+    if (!first_name || !last_name || !email || !age || !password) {
+        return res.status(400).send('Faltan datos.');
+    }
+
+    const user = await usuario.create({
+        first_name,
+        last_name,
+        email,
+        age,
+        password,
+        role: "usuario"
+    });
+
+    console.log('Usuario registrado con éxito.' + user);
+    res.redirect('/api/sessions/login');
+});
+
+
+router.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).render("login", { error: "Valores erroneos" });
+
+    const user = await usuario.findOne({ email }, { first_name: 1, last_name: 1, age: 1, password: 1, email: 1, role: 1 });
     
-            const user = new User({ first_name, last_name, email, age, password })
-            
-            req.session.first_name = first_name
-            req.session.last_name = last_name
-            req.session.email = email
-            req.session.age = age
-            req.session.password = password
-            res.redirect("/api/sessions/login")
+    if (!user) {
+        if(email === "adminCoder@coder.com" && password === "adminCod3r123"){
+            req.session.user = {
+                email: email,
+                role: "admin"
+            }
+            res.redirect("/profile");
         }else{
-            res.send('Ya está logueado')
+            return res.status(400).render("login", { error: "Usuario no encontrado" });
+        }
+    }else{
+        if(user.email !== email || user.password !== password ){
+            return res.send("Los datos ingresados son incorrectos")
         }
         
-
-    } catch (error) {
-        res.status(500).send("Error de registro")
+        if(email !== "adminCoder@coder.com" || password !== "adminCod3r123" ){
+            req.session.user = {
+                first_name: user.first_name,
+                last_name: user.last_name,
+                email: user.email,
+                age: user.age,
+                role: user.role
+            };
+        
+            //console.log(req.session)
+            res.redirect("/profile"); 
+        }
     }
-})
+});
 
-
-router.get("/login", (req, res)=>{
-    res.render('login')
-})
-
-router.post("/login", async(req, res)=>{
-    try{
-        const { email, password } = req.body
-        if(email !== req.session.email || password !== req.session.password){
-            return res.send('login failed')
-        }   
-        res.redirect("/profile")
-    }catch(error){
-        res.status(500).send("Error de login")
-    }
-})
 
 
 module.exports = router

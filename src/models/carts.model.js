@@ -27,4 +27,4 @@ cartSchema.plugin(mongoosePaginate)
 
 const cartModel = mongoose.model(cartColletion, cartSchema)
 
-module.exports = {cartModel}
+module.exports = cartModel
