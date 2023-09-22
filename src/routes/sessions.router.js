@@ -38,8 +38,8 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).render("login", { error: "Valores erroneos" });
 
-    const user = await usuario.findOne({ email }, { first_name: 1, last_name: 1, age: 1, password: 1, email: 1, role: 1 });
-    
+    const user = await usuario.findOne({ email }, { first_name: 1, last_name: 1, age: 1, password: 1, email: 1});
+
     if (!user) {
         if(email === "adminCoder@coder.com" && password === "adminCod3r123"){
             req.session.user = {
@@ -61,7 +61,7 @@ router.post("/login", async (req, res) => {
                 last_name: user.last_name,
                 email: user.email,
                 age: user.age,
-                role: user.role
+                role: "user"
             };
         
             //console.log(req.session)

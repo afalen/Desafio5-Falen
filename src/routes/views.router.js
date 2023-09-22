@@ -51,23 +51,17 @@ router.get("/profile", async (req, res) => {
         }
     
         const { first_name, last_name, email, age, role } = req.session.user
-        if(role == "admin"){
-            const result = await productModel.paginate({}, {lean: true});
-            result.first_name = "Coder",
-            result.last_name = "Admin",
-            result.email = email,
-            result.age = 2023,
-            result.role = role
-            res.render("profile", result)
-        }else{
+
             const result = await productModel.paginate({}, {lean: true});
             result.first_name = first_name,
             result.last_name = last_name,
             result.email = email,
             result.age = age,
             result.role = role
+            result.isAdmin = role === "admin" 
+            console.log(result)
             res.render("profile", result)
-        }
+        
     }catch(error){
         console.error('Error al recuperar los productos:', error);
         res.status(500).send('Error al recuperar los productos');
