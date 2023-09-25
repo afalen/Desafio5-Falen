@@ -59,7 +59,7 @@ router.get("/profile", async (req, res) => {
             result.age = age,
             result.role = role
             result.isAdmin = role === "admin" 
-            console.log(result)
+            //console.log(result)
             res.render("profile", result)
         
     }catch(error){

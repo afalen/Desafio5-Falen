@@ -6,6 +6,10 @@ const path = require('path')
 const viewsRouter = require('./routes/views.router')
 const handlebars = require('express-handlebars')
 
+const passport = require('passport')
+const initializePassport = require('./config/passport.config')
+
+
 const productsRouter = require('./routes/products.router');
 const cartsRouter = require('./routes/carts.router');
 const sessionRouter = require('./routes/sessions.router')
@@ -45,6 +49,9 @@ app.use(session({
 }))
 
 
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use('/', productsRouter)
 app.use('/', cartsRouter)
